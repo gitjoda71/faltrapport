@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
     <style>
         :root {
             --bg-primary: #0d1f0d;
@@ -240,14 +240,16 @@
                 <textarea id="slag" rows="2" placeholder="Typ av fiende/objekt"></textarea>
                 <div class="chip-group">
                     <button class="chip" onclick="appendChip('slag','Infanteri')">Infanteri</button>
-                    <button class="chip" onclick="appendChip('slag','Fordon')">Fordon</button>
-                    <button class="chip" onclick="appendChip('slag','Stridsvagn')">Stridsvagn</button>
-                    <button class="chip" onclick="appendChip('slag','Lastbil')">Lastbil</button>
-                    <button class="chip" onclick="appendChip('slag','Helikopter')">Helikopter</button>
+                    <button class="chip" onclick="appendChip('slag','Civila')">Civila</button>
+                    <button class="chip" onclick="appendChip('slag','Personbil')">Personbil</button>
                     <button class="chip" onclick="appendChip('slag','MC')">MC</button>
                     <button class="chip" onclick="appendChip('slag','Moped')">Moped</button>
                     <button class="chip" onclick="appendChip('slag','VOI')">VOI</button>
                     <button class="chip" onclick="appendChip('slag','Cykel')">Cykel</button>
+                    <button class="chip" onclick="appendChip('slag','Lastbil')">Lastbil</button>
+                    <button class="chip" onclick="appendChip('slag','Drönare')">Drönare</button>
+                    <button class="chip" onclick="appendChip('slag','Stridsvagn')">Stridsvagn</button>
+                    <button class="chip" onclick="appendChip('slag','Helikopter')">Helikopter</button>
                 </div>
             </div>
 
@@ -264,8 +266,8 @@
                     <button class="chip" onclick="appendChip('sysselsattning','Rör sig S')">Rör sig S</button>
                     <button class="chip" onclick="appendChip('sysselsattning','Rör sig Ö')">Rör sig Ö</button>
                     <button class="chip" onclick="appendChip('sysselsattning','Rör sig V')">Rör sig V</button>
-                    <button class="chip" onclick="appendChip('sysselsattning','Stannat')">Stannat</button>
-                    <button class="chip" onclick="appendChip('sysselsattning','Eldgivning')">Eldgivning</button>
+                    <button class="chip" onclick="appendChip('sysselsattning','Spanar')">Spanar</button>
+                    <button class="chip" onclick="appendChip('sysselsattning','Saboterar')">Saboterar</button>
                     <button class="chip" onclick="appendChip('sysselsattning','Patrull')">Patrull</button>
                 </div>
             </div>
@@ -421,7 +423,8 @@ async function readFoto(input) {
             const day = String(d.getDate()).padStart(2,'0');
             const h   = String(d.getHours()).padStart(2,'0');
             const m   = String(d.getMinutes()).padStart(2,'0');
-            document.getElementById('stund').value = day + h + m;
+            const s   = String(d.getSeconds()).padStart(2,'0');
+            document.getElementById('stund').value = `${day}${h}${m} (s ${s})`;
         }
 
         // Ställe från GPS
@@ -474,7 +477,8 @@ function setCurrentTime() {
     const d = String(now.getDate()).padStart(2,'0');
     const h = String(now.getHours()).padStart(2,'0');
     const m = String(now.getMinutes()).padStart(2,'0');
-    document.getElementById('stund').value = d + h + m;
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('stund').value = `${d}${h}${m} (s ${s})`;
 }
 
 // ── Rapport ─────────────────────────────────────────────────────────────────
