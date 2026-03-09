@@ -436,7 +436,7 @@ async function readFoto(input) {
     const status = document.getElementById('fotoStatus');
     status.textContent = 'Läser metadata...';
     try {
-        const exif = await exifr.parse(file, { tiff: true, gps: true, exif: true });
+        const exif = await exifr.parse(file, { tiff: true, exif: true });
         if (!exif) { status.textContent = 'Ingen EXIF-data hittades i bilden.'; return; }
 
         // Stund från DateTimeOriginal
@@ -448,28 +448,9 @@ async function readFoto(input) {
             const m   = String(d.getMinutes()).padStart(2,'0');
             const s   = String(d.getSeconds()).padStart(2,'0');
             document.getElementById('stund').value = `${day}${h}${m} (s ${s})`;
-        }
-
-        // Ställe från GPS
-        const lat = exif.latitude, lon = exif.longitude;
-        if (lat != null && lon != null) {
-            const mgrs = MGRS.forward(lat, lon);
-            let desc = '';
-            try {
-                const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=sv`);
-                const d2 = await r.json();
-                const a = d2.address || {};
-                const name   = a.amenity || a.leisure || a.building || '';
-                const street = a.road ? (a.road + (a.house_number ? ' ' + a.house_number : '')) : '';
-                const area   = a.suburb || a.neighbourhood || a.city_district || '';
-                desc = [name, street, area].filter(Boolean).join(', ');
-            } catch(_) {}
-            const result = desc ? `${mgrs}, ${desc}` : mgrs;
-            const field = document.getElementById('stalle');
-            field.value = field.value ? field.value + ', ' + result : result;
-            status.textContent = dt ? '✓ Tid och plats hämtad från foto.' : '✓ Plats hämtad från foto.';
+            status.textContent = '✓ Tid hämtad från foto.';
         } else {
-            status.textContent = dt ? '✓ Tid hämtad. Ingen GPS i bilden.' : 'Ingen EXIF-data hittades.';
+            status.textContent = 'Ingen tidsstämpel i bilden.';
         }
     } catch(e) {
         status.textContent = 'Kunde inte läsa bilden: ' + e.message;
