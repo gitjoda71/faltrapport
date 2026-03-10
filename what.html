@@ -124,10 +124,7 @@
                     <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoStalle')">i</button>
                 </div>
                 <div class="info-text" id="infoStalle">Var fordonet observerades. MGRS-koordinater eller beskrivning.</div>
-                <div class="input-row">
-                    <input type="text" id="stalle" placeholder="Plats / koordinater" autocomplete="off">
-                    <button class="btn btn-sm btn-gps" id="gpsBtn" tabindex="-1" onclick="getGPS()">📍 MGRS</button>
-                </div>
+                <input type="text" id="stalle" placeholder="Plats / koordinater" autocomplete="off">
                 <div class="saved-items" id="savedStalle"></div>
             </div>
 
@@ -243,6 +240,7 @@
 </div>
 
 <script>
+/*
 const MGRS = (() => {
     const COL_LETTERS = ['ABCDEFGH','JKLMNPQR','STUVWXYZ','ABCDEFGH','JKLMNPQR','STUVWXYZ'];
     const ROW_LETTERS = ['ABCDEFGHJKLMNPQRSTUV','FGHJKLMNPQRSTUVABCDE'];
@@ -316,6 +314,7 @@ async function getGPS() {
         { enableHighAccuracy: true, timeout: 20000, maximumAge: 30000 }
     );
 }
+*/
 
 async function readFoto(input) {
     const file = input.files[0]; if (!file) return;
