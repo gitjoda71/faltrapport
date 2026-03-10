@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d1f0d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WHAT Rapport">
+    <title>WHAT Rapport</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d1f0d; --bg-secondary: #152815; --bg-card: #1a321a;
+            --bg-input: #0f240f; --border: #2d4a2d; --border-focus: #4a7c4a;
+            --text-primary: #e8f0e8; --text-secondary: #8aaa8a; --text-muted: #5a7a5a;
+            --accent: #4caf50; --accent-hover: #66bb6a; --accent-dim: #1e3d1e;
+            --danger: #c62828; --danger-hover: #e53935; --info: #1565c0; --info-hover: #1976d2;
+            --radius: 8px; --radius-sm: 4px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 16px; }
+        .container { max-width: 560px; margin: 0 auto; }
+        header { text-align: center; padding: 20px 0 16px; }
+        header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+        header p { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 4px; }
+        .form-group { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+        .label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        label { font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+        .info-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-muted); font-size: 0.7rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.15s, color 0.15s; }
+        .info-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .info-text { display: none; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-secondary); border-left: 2px solid var(--accent-dim); padding: 8px 10px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 8px; line-height: 1.5; }
+        .info-text.show { display: block; }
+        .field-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; opacity: 0.75; }
+        input[type="text"], textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; font-size: 1rem; padding: 12px 14px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none; }
+        input[type="text"]:focus, textarea:focus { border-color: var(--border-focus); }
+        textarea { resize: vertical; min-height: 72px; }
+        .input-row { display: flex; gap: 8px; }
+        .input-row input { flex: 1; min-width: 0; }
+        .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .chip { background: #1e2d45; border: 1px solid #2e4a70; color: #90b8e8; font-size: 0.82rem; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: inherit; transition: all 0.15s; min-height: 32px; white-space: nowrap; font-weight: 500; }
+        .chip:hover { background: #2a4a7a; border-color: #4a80c0; color: #c8e0f8; }
+        .chip:active { transform: scale(0.95); }
+        .saved-items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .saved-item { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-dim); color: var(--text-secondary); font-size: 0.78rem; padding: 4px 8px; border-radius: 20px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .saved-item:hover { background: var(--border-focus); color: var(--text-primary); }
+        .saved-item .delete { color: var(--text-muted); font-size: 1rem; line-height: 1; padding: 0 2px; }
+        .saved-item .delete:hover { color: var(--danger-hover); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 20px; border: none; border-radius: var(--radius); font-family: inherit; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; transition: background 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { width: 100%; background: var(--accent); color: #fff; margin-top: 8px; font-size: 1rem; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-sm { min-height: 48px; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; }
+        .btn-gps { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-dim); }
+        .btn-gps:hover { background: var(--border-focus); border-color: var(--border-focus); }
+        .btn-gps:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-time { background: var(--accent-dim); color: var(--accent); font-size: 0.85rem; min-height: 48px; padding: 12px 16px; border-radius: var(--radius-sm); white-space: nowrap; }
+        .btn-time:hover { background: var(--border-focus); }
+        .btn-copy { width: 100%; background: var(--info); color: #fff; margin-bottom: 12px; }
+        .btn-copy:hover { background: var(--info-hover); }
+        .btn-secondary { flex: 1; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
+        .btn-danger { flex: 1; background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: var(--danger-hover); }
+        .button-group { display: flex; gap: 10px; }
+        .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+        .result-view { display: none; }
+        .result-view.active { display: block; }
+        .form-view.hidden { display: none; }
+        .result-header { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); text-align: center; margin-bottom: 12px; }
+        .report-output { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; font-family: 'Courier New', monospace; font-size: 0.95rem; line-height: 1.8; white-space: pre-wrap; color: var(--text-primary); margin-bottom: 14px; }
+        .copy-feedback { text-align: center; color: var(--accent); font-size: 0.85rem; font-weight: 600; height: 24px; opacity: 0; transition: opacity 0.2s; margin-bottom: 12px; }
+        .copy-feedback.show { opacity: 1; }
+        .tab-nav { display: flex; gap: 4px; margin-bottom: 16px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; }
+        .tab-link { flex: 1; text-align: center; padding: 9px 2px; border-radius: var(--radius-sm); color: var(--text-muted); text-decoration: none; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; transition: background 0.15s, color 0.15s; -webkit-tap-highlight-color: transparent; }
+        .tab-link:hover { background: var(--bg-card); color: var(--text-secondary); }
+        .tab-link.active { background: var(--accent-dim); color: var(--accent); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>WHAT Rapport</h1>
+        <p>Stridsfordon – detaljbeskrivning</p>
+    </header>
+    <nav class="tab-nav">
+        <a href="index.html" class="tab-link">7S</a>
+        <a href="what.html" class="tab-link active">WHAT</a>
+        <a href="scrim.html" class="tab-link">SCRIM</a>
+        <a href="weft.html" class="tab-link">WEFT</a>
+        <a href="ah.html" class="tab-link">A–H</a>
+    </nav>
+    <main>
+        <div class="form-view" id="formView">
+
+            <!-- FOTO -->
+            <div class="form-group" style="border-style:dashed;">
+                <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="readFoto(this)">
+                <button class="btn btn-primary" style="margin-top:0" onclick="document.getElementById('fotoInput').click()">📷 Fyll tid från foto</button>
+                <div id="fotoStatus" style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center"></div>
+            </div>
+
+            <!-- STUND -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="stund">Stund</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoStund')">i</button>
+                </div>
+                <div class="info-text" id="infoStund">Tidpunkt när fordonet observerades. Format: DDHHMM</div>
+                <div class="input-row">
+                    <input type="text" id="stund" inputmode="numeric" maxlength="6" placeholder="DDHHMM" autocomplete="off">
+                    <button class="btn btn-sm btn-time" tabindex="-1" onclick="setCurrentTime()">Nu</button>
+                </div>
+            </div>
+
+            <!-- STÄLLE -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="stalle">Ställe</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoStalle')">i</button>
+                </div>
+                <div class="info-text" id="infoStalle">Var fordonet observerades. MGRS-koordinater eller beskrivning.</div>
+                <div class="input-row">
+                    <input type="text" id="stalle" placeholder="Plats / koordinater" autocomplete="off">
+                    <button class="btn btn-sm btn-gps" id="gpsBtn" tabindex="-1" onclick="getGPS()">📍 MGRS</button>
+                </div>
+                <div class="saved-items" id="savedStalle"></div>
+            </div>
+
+            <!-- WHEELS -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="wheels">W – Wheels</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoWheels')">i</button>
+                </div>
+                <div class="info-text" id="infoWheels">Hjul eller band. Antal hjul/axlar, drivhjul och stödhjul, hjulens gruppering i förhållande till kroppen.</div>
+                <textarea id="wheels" rows="2" placeholder="Hjul/band, antal axlar, gruppering..."></textarea>
+                <div class="chip-group">
+                    <button class="chip" onclick="appendChip('wheels','Hjuldriven')">Hjuldriven</button>
+                    <button class="chip" onclick="appendChip('wheels','Banddriven')">Banddriven</button>
+                    <button class="chip" onclick="appendChip('wheels','4×4')">4×4</button>
+                    <button class="chip" onclick="appendChip('wheels','6×6')">6×6</button>
+                    <button class="chip" onclick="appendChip('wheels','8×8')">8×8</button>
+                    <button class="chip" onclick="appendChip('wheels','2 axlar')">2 axlar</button>
+                    <button class="chip" onclick="appendChip('wheels','3 axlar')">3 axlar</button>
+                    <button class="chip" onclick="appendChip('wheels','Drivhjul fram')">Drivhjul fram</button>
+                    <button class="chip" onclick="appendChip('wheels','Drivhjul bak')">Drivhjul bak</button>
+                </div>
+            </div>
+
+            <!-- HULL -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="hull">H – Hull</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoHull')">i</button>
+                </div>
+                <div class="info-text" id="infoHull">Fordonskroppen exklusive torn. Form, profil, antenner, avgasrör, snorkel, extra utrustning.</div>
+                <textarea id="hull" rows="2" placeholder="Kroppens form, antenner, avgasrör..."></textarea>
+                <div class="chip-group">
+                    <button class="chip" onclick="appendChip('hull','Låg profil')">Låg profil</button>
+                    <button class="chip" onclick="appendChip('hull','Hög profil')">Hög profil</button>
+                    <button class="chip" onclick="appendChip('hull','Antenn')">Antenn</button>
+                    <button class="chip" onclick="appendChip('hull','Avgasrör bak')">Avgasrör bak</button>
+                    <button class="chip" onclick="appendChip('hull','Avgasrör sida')">Avgasrör sida</button>
+                    <button class="chip" onclick="appendChip('hull','Snorkel')">Snorkel</button>
+                    <button class="chip" onclick="appendChip('hull','Extra bränsletankar')">Extra bränsletankar</button>
+                    <button class="chip" onclick="appendChip('hull','Sluttande front')">Sluttande front</button>
+                </div>
+            </div>
+
+            <!-- ARMAMENT -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="armament">A – Armament</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoArmament')">i</button>
+                </div>
+                <div class="info-text" id="infoArmament">Beväpning: kanonstorlek, kulsprutor, rökkastare, missiler, reaktivt pansar och dess placering.</div>
+                <textarea id="armament" rows="2" placeholder="Kanon, kulsprutor, reaktivt pansar..."></textarea>
+                <div class="chip-group">
+                    <button class="chip" onclick="appendChip('armament','Stor kanon (>100mm)')">Stor kanon >100mm</button>
+                    <button class="chip" onclick="appendChip('armament','Mellankanon (20–100mm)')">Kanon 20–100mm</button>
+                    <button class="chip" onclick="appendChip('armament','Liten kanon (<20mm)')">Kanon <20mm</button>
+                    <button class="chip" onclick="appendChip('armament','Kulspruta')">Kulspruta</button>
+                    <button class="chip" onclick="appendChip('armament','Rökkastare')">Rökkastare</button>
+                    <button class="chip" onclick="appendChip('armament','Pansarvärnsrobot')">Pansarvärnsrobot</button>
+                    <button class="chip" onclick="appendChip('armament','Reaktivt pansar')">Reaktivt pansar</button>
+                    <button class="chip" onclick="appendChip('armament','Ingen beväpning')">Ingen beväpning</button>
+                </div>
+            </div>
+
+            <!-- TURRET -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="turret">T – Turret</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoTurret')">i</button>
+                </div>
+                <div class="info-text" id="infoTurret">Tornets form, storlek och placering. Vad finns placerat på eller i tornet.</div>
+                <textarea id="turret" rows="2" placeholder="Tornets form, storlek, utrustning..."></textarea>
+                <div class="chip-group">
+                    <button class="chip" onclick="appendChip('turret','Tornlöst')">Tornlöst</button>
+                    <button class="chip" onclick="appendChip('turret','Litet torn')">Litet torn</button>
+                    <button class="chip" onclick="appendChip('turret','Stort torn')">Stort torn</button>
+                    <button class="chip" onclick="appendChip('turret','Öppet torn')">Öppet torn</button>
+                    <button class="chip" onclick="appendChip('turret','Kulspruta på torn')">Kulspruta på torn</button>
+                    <button class="chip" onclick="appendChip('turret','Torn placerat fram')">Torn fram</button>
+                    <button class="chip" onclick="appendChip('turret','Torn placerat bak')">Torn bak</button>
+                    <button class="chip" onclick="appendChip('turret','Torn i mitten')">Torn mitten</button>
+                </div>
+            </div>
+
+            <!-- SAGESMAN -->
+            <div class="form-group">
+                <div class="label-row">
+                    <label for="sagesman">Sagesman</label>
+                    <button class="info-btn" tabindex="-1" onclick="toggleInfo('infoSagesman')">i</button>
+                </div>
+                <div class="info-text" id="infoSagesman">Format: NIN 111. 1a p, 2a grp. För- och Efternamn<br><u>Gu</u>nnarsson, <u>D</u>aniel → GUD</div>
+                <input type="text" id="sagesman" placeholder="GUD 111. 3e p, 2a grp." autocomplete="off">
+                <div class="field-hint">(Namnkod = de två första bokstäverna i efternamnet + första bokstaven i förnamnet)</div>
+                <div class="saved-items" id="savedSagesman"></div>
+            </div>
+
+            <hr class="divider">
+            <button class="btn btn-primary" onclick="generateReport()">Generera rapport</button>
+        </div>
+
+        <!-- Resultatvy -->
+        <div class="result-view" id="resultView">
+            <div class="result-header">Rapport redo att kopieras</div>
+            <div class="report-output" id="reportOutput"></div>
+            <button class="btn btn-copy" onclick="copyToClipboard()">Kopiera till urklipp</button>
+            <div class="copy-feedback" id="copyFeedback">✓ Kopierat</div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="backToEdit()">Redigera</button>
+                <button class="btn btn-danger" onclick="resetForm()">Nollställ</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const MGRS = (() => {
+    const COL_LETTERS = ['ABCDEFGH','JKLMNPQR','STUVWXYZ','ABCDEFGH','JKLMNPQR','STUVWXYZ'];
+    const ROW_LETTERS = ['ABCDEFGHJKLMNPQRSTUV','FGHJKLMNPQRSTUVABCDE'];
+    function zoneLetter(lat) { return 'CDEFGHJKLMNPQRSTUVWX'[Math.floor((lat + 80) / 8)] || '?'; }
+    function zoneNumber(lat, lon) {
+        let z = Math.floor((lon + 180) / 6) + 1;
+        if (lat >= 56 && lat < 64 && lon >= 3 && lon < 12) return 32;
+        if (lat >= 72 && lat < 84) { if (lon >= 0 && lon < 9) return 31; if (lon >= 9 && lon < 21) return 33; if (lon >= 21 && lon < 33) return 35; if (lon >= 33 && lon < 42) return 37; }
+        return z;
+    }
+    function toUTM(lat, lon) {
+        const R = Math.PI/180, a = 6378137, f = 1/298.257223563, b = a*(1-f);
+        const e2 = (a*a-b*b)/(a*a), ep2 = e2/(1-e2), k0 = 0.9996;
+        const lr = lat*R, lo = lon*R, zn = zoneNumber(lat, lon), lo0 = ((zn-1)*6-180+3)*R;
+        const N = a/Math.sqrt(1-e2*Math.sin(lr)**2), T = Math.tan(lr)**2, C = ep2*Math.cos(lr)**2, A = Math.cos(lr)*(lo-lo0);
+        const M = a*((1-e2/4-3*e2**2/64-5*e2**3/256)*lr-(3*e2/8+3*e2**2/32+45*e2**3/1024)*Math.sin(2*lr)+(15*e2**2/256+45*e2**3/1024)*Math.sin(4*lr)-(35*e2**3/3072)*Math.sin(6*lr));
+        const E = k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T**2+72*C-58*ep2)*A**5/120)+500000;
+        let Ns = k0*(M+N*Math.tan(lr)*(A**2/2+(5-T+9*C+4*C**2)*A**4/24+(61-58*T+T**2+600*C-330*ep2)*A**6/720));
+        if (lat < 0) Ns += 10000000;
+        return { E, N: Ns, zn, zl: zoneLetter(lat) };
+    }
+    function gridSquare(E, Ns, zn) {
+        const s = (zn-1)%6, col = Math.floor(E/100000)-1, row = Math.floor(Ns/100000)%20;
+        return COL_LETTERS[s][col] + ROW_LETTERS[s%2][row];
+    }
+    function forward(lat, lon) {
+        const utm = toUTM(lat, lon), sq = gridSquare(utm.E, utm.N, utm.zn);
+        return `${utm.zn}${utm.zl}${sq} ${String(Math.floor(utm.E%100000)).padStart(5,'0')} ${String(Math.floor(utm.N%100000)).padStart(5,'0')}`;
+    }
+    return { forward };
+})();
+
+async function applyGPSPosition(pos) {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    const mgrs = MGRS.forward(lat, lon);
+    let desc = '';
+    try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=sv`);
+        const d = await r.json(); const a = d.address || {};
+        const name = a.amenity || a.leisure || a.building || '';
+        const street = a.road ? (a.road + (a.house_number ? ' ' + a.house_number : '')) : '';
+        const area = a.suburb || a.neighbourhood || a.city_district || '';
+        desc = [name, street, area].filter(Boolean).join(', ');
+    } catch (_) {}
+    const result = desc ? `${mgrs}, ${desc}` : mgrs;
+    const field = document.getElementById('stalle');
+    field.value = field.value ? field.value + ', ' + result : result;
+}
+function gpsErrorMessage(err) {
+    if (err.code === 1) return 'Platsåtkomst nekad – tillåt i webbläsarens inställningar och ladda om sidan.';
+    if (err.code === 2) return 'Positionen kunde inte bestämmas – försök igen utomhus.';
+    if (err.code === 3) return 'Tidsgräns överskreds – gå utomhus och försök igen.';
+    return 'Kunde inte hämta position: ' + err.message;
+}
+async function getGPS() {
+    const btn = document.getElementById('gpsBtn');
+    if (!navigator.geolocation) { alert('Geolocation stöds ej i denna webbläsare.'); return; }
+    btn.textContent = '⏳ Hämtar...'; btn.disabled = true;
+    const done = () => { btn.textContent = '📍 MGRS'; btn.disabled = false; };
+    navigator.geolocation.getCurrentPosition(
+        async pos => { await applyGPSPosition(pos); done(); },
+        err => {
+            if (err.code === 3) {
+                navigator.geolocation.getCurrentPosition(
+                    async pos => { await applyGPSPosition(pos); done(); },
+                    err2 => { alert(gpsErrorMessage(err2)); done(); },
+                    { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+                );
+            } else { alert(gpsErrorMessage(err)); done(); }
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 30000 }
+    );
+}
+
+async function readFoto(input) {
+    const file = input.files[0]; if (!file) return;
+    const status = document.getElementById('fotoStatus');
+    status.textContent = 'Läser metadata...';
+    try {
+        const exif = await exifr.parse(file, { tiff: true, exif: true });
+        if (!exif) { status.textContent = 'Ingen EXIF-data hittades.'; return; }
+        const dt = exif.DateTimeOriginal || exif.DateTime;
+        if (dt) {
+            const d = new Date(dt);
+            document.getElementById('stund').value = `${String(d.getDate()).padStart(2,'0')}${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')} (s ${String(d.getSeconds()).padStart(2,'0')})`;
+            status.textContent = '✓ Tid hämtad från foto.';
+        } else { status.textContent = 'Ingen tidsstämpel i bilden.'; }
+    } catch(e) { status.textContent = 'Kunde inte läsa bilden: ' + e.message; }
+    input.value = '';
+}
+
+function appendChip(id, val) { const el = document.getElementById(id); el.value = el.value.trim() ? el.value.trimEnd() + ', ' + val : val; el.focus(); }
+function toggleInfo(id) { document.getElementById(id).classList.toggle('show'); }
+function setCurrentTime() {
+    const now = new Date();
+    document.getElementById('stund').value = `${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')} (s ${String(now.getSeconds()).padStart(2,'0')})`;
+}
+
+function generateReport() {
+    const v = id => document.getElementById(id).value;
+    savePlaceIfNew(v('stalle')); saveSagesmanIfNew(v('sagesman'));
+    const lines = [
+        'WHAT RAPPORT\n',
+        `Stund:    ${v('stund') || '-'}`,
+        `Ställe:   ${v('stalle') || '-'}`,
+        `Wheels:   ${v('wheels') || '-'}`,
+        `Hull:     ${v('hull') || '-'}`,
+        `Armament: ${v('armament') || '-'}`,
+        `Turret:   ${v('turret') || '-'}`,
+        `Sagesman: ${v('sagesman') || '-'}`,
+    ];
+    document.getElementById('reportOutput').textContent = lines.join('\n');
+    document.getElementById('formView').classList.add('hidden');
+    document.getElementById('resultView').classList.add('active');
+}
+
+function copyToClipboard() {
+    const text = document.getElementById('reportOutput').textContent;
+    const afterCopy = () => {
+        showCopyFeedback();
+        setTimeout(() => { const a = document.createElement('a'); a.href = 'sgnl://compose?text=' + encodeURIComponent(text); a.click(); }, 400);
+    };
+    if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(text).then(afterCopy).catch(() => { fallbackCopy(text); afterCopy(); }); }
+    else { fallbackCopy(text); afterCopy(); }
+}
+function fallbackCopy(text) { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e) { alert('Kunde inte kopiera.'); } document.body.removeChild(ta); }
+function showCopyFeedback() { const el = document.getElementById('copyFeedback'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
+function backToEdit() { document.getElementById('formView').classList.remove('hidden'); document.getElementById('resultView').classList.remove('active'); }
+function resetForm() {
+    if (!confirm('Nollställ rapporten?')) return;
+    ['stund','stalle','wheels','hull','armament','turret','sagesman'].forEach(id => document.getElementById(id).value = '');
+    backToEdit();
+}
+
+const get = key => JSON.parse(localStorage.getItem(key) || '[]');
+const set = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+function savePlaceIfNew(v) { if (!v?.trim()) return; let items = get('7s_places'); if (!items.includes(v)) { set('7s_places', [v,...items].slice(0,5)); loadSavedItems(); } }
+function saveSagesmanIfNew(v) { if (!v?.trim()) return; let items = get('7s_sagesman'); if (!items.includes(v)) set('7s_sagesman', [v,...items].slice(0,5)); localStorage.setItem('7s_lastSagesman', v); loadSavedItems(); }
+function loadLastSagesman() { const last = localStorage.getItem('7s_lastSagesman'); if (last) document.getElementById('sagesman').value = last; }
+function loadSavedItems() {
+    renderSaved('savedStalle', get('7s_places'), 'stalle', deleteSavedPlace);
+    renderSaved('savedSagesman', get('7s_sagesman'), 'sagesman', deleteSavedSagesman);
+}
+function renderSaved(cid, items, inputId, delFn) {
+    const c = document.getElementById(cid); c.innerHTML = '';
+    items.forEach(item => {
+        const s = document.createElement('span'); s.className = 'saved-item';
+        s.onclick = () => document.getElementById(inputId).value = item;
+        s.appendChild(document.createTextNode(item));
+        const d = document.createElement('span'); d.className = 'delete'; d.textContent = '×';
+        d.onclick = e => { e.stopPropagation(); delFn(item); };
+        s.appendChild(d); c.appendChild(s);
+    });
+}
+function deleteSavedPlace(v) { set('7s_places', get('7s_places').filter(x=>x!==v)); loadSavedItems(); }
+function deleteSavedSagesman(v) { set('7s_sagesman', get('7s_sagesman').filter(x=>x!==v)); loadSavedItems(); }
+
+document.addEventListener('DOMContentLoaded', () => { loadSavedItems(); loadLastSagesman(); });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
+</script>
+</body>
+</html>
