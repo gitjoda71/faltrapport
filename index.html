@@ -570,7 +570,7 @@ function backToEdit() {
 }
 function resetForm() {
     if (!confirm('Nollställ rapporten?')) return;
-    ['stund','stalle','styrka','slag','sysselsattning','symbol','sedan'].forEach(id =>
+    ['stund','stalle','styrka','slag','sysselsattning','symbol','sedan','sagesman'].forEach(id =>
         document.getElementById(id).value = '');
     backToEdit();
 }

@@ -369,7 +369,7 @@ function showCopyFeedback() { const el = document.getElementById('copyFeedback')
 function backToEdit() { document.getElementById('formView').classList.remove('hidden'); document.getElementById('resultView').classList.remove('active'); }
 function resetForm() {
     if (!confirm('Nollställ rapporten?')) return;
-    ['stund','stalle','wings','engines','fuselage','tail'].forEach(id => document.getElementById(id).value = '');
+    ['stund','stalle','wings','engines','fuselage','tail','sagesman'].forEach(id => document.getElementById(id).value = '');
     backToEdit();
 }
 

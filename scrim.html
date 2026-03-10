@@ -375,7 +375,7 @@ function showCopyFeedback() { const el = document.getElementById('copyFeedback')
 function backToEdit() { document.getElementById('formView').classList.remove('hidden'); document.getElementById('resultView').classList.remove('active'); }
 function resetForm() {
     if (!confirm('Nollställ rapporten?')) return;
-    ['stund','stalle','size','colour','registration','identifying','model'].forEach(id => document.getElementById(id).value = '');
+    ['stund','stalle','size','colour','registration','identifying','model','sagesman'].forEach(id => document.getElementById(id).value = '');
     backToEdit();
 }
 
